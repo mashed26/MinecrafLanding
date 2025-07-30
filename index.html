@@ -173,6 +173,59 @@
             margin-left: 8px;
             font-weight: 700;
         }
+        .ip-status {
+            display: flex;
+            align-items: center;
+            margin-left: 12px;
+            font-size: 1.1rem;
+            gap: 6px;
+        }
+        .dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .dot.online {
+            background: #3ec46d;
+        }
+        .dot.offline {
+            background: #e74c3c;
+        }
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #222f3e;
+            color: #fff;
+            border: 2px solid #e74c3c;
+            font-size: 1rem;
+            margin-left: 6px;
+            cursor: pointer;
+            position: relative;
+        }
+        .info-tooltip {
+            display: none;
+            position: absolute;
+            top: 28px;
+            right: 0;
+            left: auto;
+            transform: none;
+            background: #23272e;
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 1rem;
+            white-space: nowrap;
+            box-shadow: 0 2px 12px 0 rgba(31, 38, 135, 0.18);
+            z-index: 100;
+        }
+        .info-icon:hover .info-tooltip {
+            display: block;
+        }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -185,6 +238,14 @@
         <span class="ip-label">Server IP:</span>
         <span class="ip-value" id="ipValue">father-waterproof.gl.joinmc.link</span>
         <button class="ip-copy" id="ipCopyBtn">Copy</button>
+        <span class="ip-status" id="ipStatus">
+            <span class="dot" id="statusDot"></span>
+            <span id="statusText"></span>
+            <span class="info-icon" id="infoIcon" style="display:none;">
+                i
+                <span class="info-tooltip">The server is undergoing maintenance</span>
+            </span>
+        </span>
         <span class="ip-copied" id="ipCopied" style="display:none;">Copied!</span>
     </div>
     <div class="center-content">
@@ -202,7 +263,7 @@
                 link: 'https://drive.google.com/file/d/1fSC8KNbrThShLmi470aiyMZCIfzhgWtl/view?usp=sharing'
             },
             {
-                label: 'Download Stright Mod Files',
+                label: 'Download Mod Files',
                 link: 'https://drive.google.com/file/d/17n3doW3A_ndzFuktfvQvlluOfo8rKLzE/view?usp=sharing'
             }
         ];
@@ -310,6 +371,54 @@
                 })
                 .catch(err => console.error('Error copying text: ', err));
         });
+
+        // Server status dot animation
+        const serverStatusDot = document.getElementById('serverStatusDot');
+        const serverInfoIcon = document.getElementById('serverInfoIcon');
+        const serverInfoTooltip = document.getElementById('serverInfoTooltip');
+
+        function updateServerStatus(online) {
+            if (online) {
+                serverStatusDot.classList.add('online');
+                serverStatusDot.classList.remove('offline');
+                serverInfoIcon.style.borderColor = '#3ec46d';
+                serverInfoTooltip.textContent = 'Server is online';
+            } else {
+                serverStatusDot.classList.remove('online');
+                serverStatusDot.classList.add('offline');
+                serverInfoIcon.style.borderColor = '#e74c3c';
+                serverInfoTooltip.textContent = 'Server is offline';
+            }
+        }
+
+        async function checkServerStatus() {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const infoIcon = document.getElementById('infoIcon');
+            // Use a public Minecraft status API (e.g. mcsrvstat.us)
+            const ip = document.getElementById('ipValue').textContent.trim();
+            try {
+                const resp = await fetch(`https://api.mcsrvstat.us/3/${ip}`);
+                if (!resp.ok) throw new Error('API error');
+                const data = await resp.json();
+                if (data && data.online) {
+                    statusDot.className = 'dot online';
+                    statusText.textContent = 'Online';
+                    infoIcon.style.display = 'none';
+                } else {
+                    statusDot.className = 'dot offline';
+                    statusText.textContent = 'Offline';
+                    infoIcon.style.display = 'inline-flex';
+                }
+            } catch (e) {
+                statusDot.className = 'dot offline';
+                statusText.textContent = 'Offline';
+                infoIcon.style.display = 'inline-flex';
+            }
+        }
+        checkServerStatus();
+        // Optionally, refresh every 10 seconds
+        setInterval(checkServerStatus, 10000);
     </script>
 </body>
 </html>
