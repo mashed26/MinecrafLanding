@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraf: Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        body {
+            min-height: 100vh;
+            min-width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: #0f2027;
+        }
+        #bg {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0;
+            background: #000;
+            filter: blur(2.5px);
+        }
+        .center-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .welcome {
+            font-family: 'Orbitron', Arial, sans-serif;
+            font-size: 3rem;
+            color: #fff;
+            background: transparent;
+            border-radius: 24px;
+            padding: 32px 48px 24px 48px;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+        .dropdown {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            position: relative;
+            height: 60px;
+        }
+        .dropdown-btn {
+            font-family: 'Orbitron', Arial, sans-serif;
+            font-size: 1.3rem;
+            background: #24a0ed;
+            color: #fff;
+            border: none;
+            border-radius: 32px 0 0 32px;
+            padding: 0 36px 0 32px;
+            height: 60px;
+            min-width: 270px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px 0 rgba(33, 147, 176, 0.25);
+            outline: none;
+            position: relative;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .dropdown-toggle {
+            background: #24a0ed;
+            color: #fff;
+            border: none;
+            border-radius: 0 32px 32px 0;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 16px 0 rgba(33, 147, 176, 0.15);
+            outline: none;
+            margin-left: -1px;
+            transition: background 0.2s;
+        }
+        .dropdown-toggle:active, .dropdown-btn:active {
+            background: #1b7fc2;
+        }
+        .dropdown-list {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 100%;
+            min-width: 330px;
+            background: rgba(30, 30, 30, 0.97);
+            border-radius: 24px 24px 24px 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            z-index: 2;
+            overflow: hidden;
+        }
+        .dropdown-list.show {
+            display: block;
+            animation: fadeIn 0.2s;
+        }
+        .dropdown-option {
+            font-family: 'Orbitron', Arial, sans-serif;
+            font-size: 1.1rem;
+            color: #fff;
+            padding: 16px 32px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            transition: background 0.15s;
+        }
+        .dropdown-option:hover {
+            background: #24a0ed;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg"></canvas>
+    <div class="center-content">
+        <div class="welcome">Welcome to Minecraf War!</div>
+        <div class="dropdown">
+            <button class="dropdown-btn" id="downloadBtn">Download Modrinth Modpack</button>
+            <button class="dropdown-toggle" id="dropdownToggle">&#9660;</button>
+            <div class="dropdown-list" id="dropdownList"></div>
+        </div>
+    </div>
+    <script>
+        const options = [
+            {
+                label: 'Download Modrinth Modpack',
+                link: 'https://drive.google.com/file/d/1fSC8KNbrThShLmi470aiyMZCIfzhgWtl/view?usp=sharing'
+            },
+            {
+                label: 'Download Stright Mod Files',
+                link: 'https://drive.google.com/file/d/17n3doW3A_ndzFuktfvQvlluOfo8rKLzE/view?usp=sharing'
+            }
+        ];
+        let current = 0;
+        const btn = document.getElementById('downloadBtn');
+        const dropdown = document.getElementById('dropdownList');
+        const toggle = document.getElementById('dropdownToggle');
+        function updateDropdown() {
+            dropdown.innerHTML = '';
+            options.forEach((opt, i) => {
+                if (i !== current) {
+                    const b = document.createElement('button');
+                    b.className = 'dropdown-option';
+                    b.textContent = opt.label;
+                    b.setAttribute('data-label', opt.label);
+                    b.setAttribute('data-link', opt.link);
+                    b.onclick = () => {
+                        const prev = current;
+                        current = i;
+                        btn.textContent = opt.label;
+                        btn.onclick = () => window.open(opt.link, '_blank');
+                        updateDropdown();
+                        dropdown.classList.remove('show');
+                    };
+                    dropdown.appendChild(b);
+                }
+            });
+        }
+        btn.onclick = () => window.open(options[current].link, '_blank');
+        btn.addEventListener('click', e => e.stopPropagation());
+        toggle.addEventListener('click', e => {
+            e.stopPropagation();
+            dropdown.classList.toggle('show');
+        });
+        document.body.addEventListener('click', () => dropdown.classList.remove('show'));
+        updateDropdown();
+        // Animated background
+        const canvas = document.getElementById('bg');
+        const ctx = canvas.getContext('2d');
+        let w = window.innerWidth, h = window.innerHeight;
+        function resize() {
+            w = window.innerWidth;
+            h = window.innerHeight;
+            canvas.width = w;
+            canvas.height = h;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+        const particles = [];
+        const colors = [
+            '#24a0ed', '#2193b0', '#0f2027', '#7f53ac', '#23272e', '#1b2836', '#1a2636', '#222f3e', '#2c3e50', '#34495e', '#22313f', '#2d3436',
+            '#0a2342', '#0d1b2a', '#1a1a2e', '#2e294e', '#2c003e', '#1b1b3a', // dark blues
+            '#7b1e3a', '#a4161a', '#6f2232', '#b22234', '#8b0000', '#c0392b', '#a93226' // dark reds
+        ];
+        function randomSize() {
+            // Range: 10 to 120 px, more random
+            return 10 + Math.pow(Math.random(), 1.7) * 110;
+        }
+        for (let i = 0; i < 80; i++) {
+            const r = randomSize();
+            particles.push({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                r: r,
+                dx: (Math.random() - 0.5) * 0.7,
+                dy: (Math.random() - 0.5) * 0.7,
+                color: colors[Math.floor(Math.random() * colors.length)]
+            });
+        }
+        function draw() {
+            ctx.clearRect(0, 0, w, h);
+            for (let p of particles) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = 0.7;
+                ctx.shadowColor = p.color;
+                ctx.shadowBlur = 24;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.globalAlpha = 1;
+                p.x += p.dx;
+                p.y += p.dy;
+                if (p.x < -p.r) p.x = w + p.r;
+                if (p.x > w + p.r) p.x = -p.r;
+                if (p.y < -p.r) p.y = h + p.r;
+                if (p.y > h + p.r) p.y = -p.r;
+            }
+            requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
+</body>
+</html>
