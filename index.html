@@ -126,6 +126,53 @@
         .dropdown-option:hover {
             background: #24a0ed;
         }
+        .ip-area {
+            position: absolute;
+            top: 32px;
+            right: 40px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            background: rgba(30,30,40,0.7);
+            border-radius: 18px;
+            padding: 10px 18px 10px 18px;
+            box-shadow: 0 2px 12px 0 rgba(31, 38, 135, 0.18);
+            font-family: 'Orbitron', Arial, sans-serif;
+            font-size: 1.1rem;
+            color: #fff;
+            gap: 10px;
+        }
+        .ip-label {
+            font-weight: 700;
+            margin-right: 6px;
+        }
+        .ip-value {
+            font-family: monospace;
+            background: rgba(0,0,0,0.18);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 1.1rem;
+        }
+        .ip-copy {
+            background: #24a0ed;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 14px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-left: 8px;
+            transition: background 0.18s;
+        }
+        .ip-copy:hover {
+            background: #1b7fc2;
+        }
+        .ip-copied {
+            color: #24a0ed;
+            font-size: 1rem;
+            margin-left: 8px;
+            font-weight: 700;
+        }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -134,6 +181,12 @@
 </head>
 <body>
     <canvas id="bg"></canvas>
+    <div class="ip-area" id="ipArea">
+        <span class="ip-label">Server IP:</span>
+        <span class="ip-value" id="ipValue">father-waterproof.gl.joinmc.link</span>
+        <button class="ip-copy" id="ipCopyBtn">Copy</button>
+        <span class="ip-copied" id="ipCopied" style="display:none;">Copied!</span>
+    </div>
     <div class="center-content">
         <div class="welcome">Welcome to Minecraf War!</div>
         <div class="dropdown">
@@ -241,6 +294,22 @@
             requestAnimationFrame(draw);
         }
         draw();
+
+        // Copy IP functionality
+        const ipCopyBtn = document.getElementById('ipCopyBtn');
+        const ipValue = document.getElementById('ipValue');
+        const ipCopied = document.getElementById('ipCopied');
+
+        ipCopyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(ipValue.textContent)
+                .then(() => {
+                    ipCopied.style.display = 'inline';
+                    setTimeout(() => {
+                        ipCopied.style.display = 'none';
+                    }, 2000);
+                })
+                .catch(err => console.error('Error copying text: ', err));
+        });
     </script>
 </body>
 </html>
